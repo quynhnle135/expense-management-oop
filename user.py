@@ -36,10 +36,7 @@ class User:
             title = input("Enter title: ")
 
             print("-Transaction date-")
-            expense_date_year = int(input("Enter expense date YEAR: "))
-            expense_date_month = int(input("Enter expense date MONTH: "))
-            expense_date_day = int(input("Enter expense date DAY: "))
-            expense_date = datetime.date(expense_date_year, expense_date_month, expense_date_day)
+            expense_date = self._get_date_from_user(prompt="Enter the expense")
 
             amount = float(input("Enter the expense amount: "))
             category = input("Enter category: ")
@@ -90,67 +87,83 @@ class User:
             total += expense.amount
         return total
 
-    # TODO: Organize this function
     def edit_expense(self, search_id):
-        found_id = False
+        # Search for expense by ID
+        expense = self._find_expense_by_id(search_id)
 
+        # Exit function if the expense is not found
+        if expense is None:
+            print("Invalid ID")
+            return
+
+        # Show editing options to the user
+        edit_choice = self._get_edit_choice()
+
+        # Apply the edit based on user's choice
+        if self._apply_edit_to_expense(edit_choice, expense):
+            print("Successfully edited!")
+        else:
+            print("Invalid choice")
+
+    def _find_expense_by_id(self, search_id):
         for expense in self.total_expenses:
             if expense.id == int(search_id):
-                edit_choice = input("What field do you want to edit?\n"
-                                    "1. Card name\n"
-                                    "2. Title\n"
-                                    "3. Expense date\n"
-                                    "4. Amount\n"
-                                    "5. Category\n"
-                                    "6. Note\n")
-                if edit_choice == "1":
-                    print("- Edit card name -")
-                    new_card_name = input("Enter new card name: ")
-                    expense.card_name = new_card_name
-                    found_id = True
+                return expense
+        return None
 
-                elif edit_choice == "2":
-                    print("- Edit title -")
-                    new_title = input("Enter new title: ")
-                    expense.title = new_title
-                    found_id = True
+    def _get_edit_choice(self):
+        return input("What field do you want to edit?\n"
+                     "1. Card name\n"
+                     "2. Title\n"
+                     "3. Expense date\n"
+                     "4. Amount\n"
+                     "5. Category\n"
+                     "6. Note\n")
 
-                # TODO: Handle if user enters incorrect year/month/date
-                elif edit_choice == "3":
-                    print("- Edit expense date -")
-                    expense_date_year = int(input("Enter expense date YEAR: "))
-                    expense_date_month = int(input("Enter expense date MONTH: "))
-                    expense_date_day = int(input("Enter expense date DAY: "))
-                    new_expense_date = datetime.date(expense_date_year, expense_date_month, expense_date_day)
-                    expense.expense_date = new_expense_date
-                    found_id = True
+    def _apply_edit_to_expense(self, edit_choice, expense):
+        if edit_choice == "1":
+            new_card_name = input("Enter new card name: ")
+            expense.card_name = new_card_name
+            return True
 
-                elif edit_choice == "4":
-                    print("- Edit amount - ")
-                    new_amount = float(input("Enter new amount: "))
-                    expense.amount = new_amount
-                    found_id = True
+        elif edit_choice == "2":
+            new_title = input("Enter new title: ")
+            expense.title = new_title
+            return True
 
-                elif edit_choice == "5":
-                    print("- Edit category -")
-                    new_category = input("Enter new category: ")
-                    expense.category = new_category
-                    found_id = True
+        elif edit_choice == "3":
+            try:
+                new_expense_date = self._get_date_from_user(prompt="Enter the expense")
 
-                elif edit_choice == "6":
-                    print("- Edit note - ")
-                    new_note = input("Enter new note: ")
-                    expense.note = new_note
-                    found_id = True
+                # Check if the entered date is in the future
+                current_date = datetime.date.today()
+                if new_expense_date > current_date:
+                    print("The entered date cannot be in the future. Please try again.")
+                    return False
 
-                else:
-                    print("Invalid choice")
-                    break
+                expense.expense_date = new_expense_date
+                return True
 
-        if not found_id:
-            print("Invalid ID")
-        else:
-            print("Successfully edited!")
+            except ValueError:
+                print("Invalid date entered. Please try again.")
+                return False
+
+        elif edit_choice == "4":
+            new_amount = float(input("Enter new amount: "))
+            expense.amount = new_amount
+            return True
+
+        elif edit_choice == "5":
+            new_category = input("Enter new category: ")
+            expense.category = new_category
+            return True
+
+        elif edit_choice == "6":
+            new_note = input("Enter new note: ")
+            expense.note = new_note
+            return True
+
+        return False
 
     def delete_expense(self, search_id):
         found = False
@@ -202,7 +215,6 @@ class User:
         else:
             print(f"Cannot find any expense in {search_category} category.")
 
-    # TODO: Organize this function
     def search(self):
         user_input = input("What field do you want to search expense by?\n"
                            "1. ID\n"
@@ -230,27 +242,17 @@ class User:
         elif user_input == "4":
             print("- Search by transaction date period -")
             try:
-                search_start_year = int(input("Please enter the starting year: "))
-                search_start_month = int(input("Please enter the starting month: "))
-                search_start_day = int(input("Please enter the starting day: "))
-
-                # Validate date before creating a date object
-                if not (1 <= search_start_month <= 12) or not (1 <= search_start_day <= 31):
-                    print("Invalid month or day. Please try again.")
+                search_start_date = self._get_date_from_user(prompt="Enter the starting")
+                is_valid, message = self._validate_date(search_start_date)
+                if not is_valid:
+                    print(message)
                     return
 
-                search_start_date = datetime.date(search_start_year, search_start_month, search_start_day)
-
-                search_end_year = int(input("Please enter the ending year: "))
-                search_end_month = int(input("Please enter the ending month: "))
-                search_end_day = int(input("Please enter the ending day: "))
-
-                # Validate date before creating a date object
-                if not (1 <= search_end_month <= 12) or not (1 <= search_end_day <= 31):
-                    print("Invalid month or day. Please try again.")
+                search_end_date = self._get_date_from_user(prompt="Enter the ending")
+                is_valid, message = self._validate_date(search_end_date)
+                if not is_valid:
+                    print(message)
                     return
-
-                search_end_date = datetime.date(search_end_year, search_end_month, search_end_day)
 
                 # Validate that the start date is before or equal to the end date
                 if search_start_date > search_end_date:
@@ -362,3 +364,15 @@ class User:
                 print(e)
         else:
             print(f"Cannot find any expense with {note} note")
+
+    def _get_date_from_user(self, prompt):
+        year = int(input(f"{prompt} YEAR: "))
+        month = int(input(f"{prompt} MONTH: "))
+        day = int(input(f"{prompt} DAY: "))
+
+        return datetime.date(year, month, day)
+
+    def _validate_date(self, date):
+        if not (1 <= date.month <= 12) or not (1 <= date.day <= 31):
+            return False, "Invalid month or day. Please try again."
+        return True, ""
