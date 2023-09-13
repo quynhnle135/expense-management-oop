@@ -218,20 +218,47 @@ class User:
             search_card_name = input("Please enter the Card name to look up: ")
             self._search_by_card_name(card_name=search_card_name)
 
-        # TODO: Handle if user enters incorrect year/month/date
         elif user_input == "4":
             print("- Search by transaction date period -")
-            search_start_year = int(input("Please enter the starting year: "))
-            search_start_month = int(input("Please enter the starting month: "))
-            search_start_day = int(input("Please enter the starting day: "))
-            search_start_date = datetime.date(search_start_year, search_start_month, search_start_day)
+            try:
+                search_start_year = int(input("Please enter the starting year: "))
+                search_start_month = int(input("Please enter the starting month: "))
+                search_start_day = int(input("Please enter the starting day: "))
 
-            search_end_year = int(input("Please enter the ending year: "))
-            search_end_month = int(input("Please enter the ending month: "))
-            search_end_day = int(input("Please enter the ending day: "))
-            search_end_date = datetime.date(search_end_year, search_end_month, search_end_day)
+                # Validate date before creating a date object
+                if not (1 <= search_start_month <= 12) or not (1 <= search_start_day <= 31):
+                    print("Invalid month or day. Please try again.")
+                    return
 
-            self._search_by_date(start_date=search_start_date, end_date=search_end_date)
+                search_start_date = datetime.date(search_start_year, search_start_month, search_start_day)
+
+                search_end_year = int(input("Please enter the ending year: "))
+                search_end_month = int(input("Please enter the ending month: "))
+                search_end_day = int(input("Please enter the ending day: "))
+
+                # Validate date before creating a date object
+                if not (1 <= search_end_month <= 12) or not (1 <= search_end_day <= 31):
+                    print("Invalid month or day. Please try again.")
+                    return
+
+                search_end_date = datetime.date(search_end_year, search_end_month, search_end_day)
+
+                # Validate that the start date is before or equal to the end date
+                if search_start_date > search_end_date:
+                    print("The start date must be before or equal to the end date. Please try again.")
+                    return
+
+                # Validate if the entered date is in the future
+                current_date = datetime.date.today()
+                if search_start_date > current_date or search_end_date > current_date:
+                    print("The entered date cannot be in the future. Please try again.")
+                    return
+
+                self._search_by_date(start_date=search_start_date, end_date=search_end_date)
+
+            except ValueError as e:
+                print(f"An error occurred: {e}")
+                print("Please enter a valid date.")
 
         elif user_input == "5":
             print("- Search by amount -")
