@@ -8,71 +8,78 @@ class User:
 
     def menu(self):
         while True:
-            user_choice = input("---Welcome to Expense Management App---\n"
-                                "1. Add expense\n"
-                                "2. Calculate total expenses\n"
-                                "3. Edit an expense\n"
-                                "4. Delete an expense\n"
-                                "5. Search an expense\n"
-                                "6. View all expenses\n"
-                                "7. Calculate total by category\n"
-                                "8. View all categories\n")
-            if user_choice == "1":
-                print("---Add expense---")
-                card_name = input("Enter card name: ")
-                title = input("Enter title: ")
+            user_choice = self.get_menu_choice()
+            self.process_choice(user_choice)
 
-                print("-Transaction date-")
-                expense_date_year = int(input("Enter expense date YEAR: "))
-                expense_date_month = int(input("Enter expense date MONTH: "))
-                expense_date_day = int(input("Enter expense date DAY: "))
-                expense_date = datetime.date(expense_date_year, expense_date_month, expense_date_day)
-
-                amount = float(input("Enter the expense amount: "))
-                category = input("Enter category: ")
-                note = input("Enter note (optional): ")
-
-                expense = Expense(card_name, title, expense_date, amount, category, note)
-                self.total_expenses.append(expense)
-
-            elif user_choice == "2":
-                print("---Calculate Total---")
-                total = self.calculate_total()
-                print(f"Total amount: {total}")
-
-            elif user_choice == "3":
-                print("---Edit an expense---")
-                edit_id = input("Enter the expense ID you want to edit: ")
-                self.edit_expense(search_id=edit_id)
-
-            elif user_choice == "4":
-                search_id = int(input("Enter the ID of the expense you want to delete: "))
-                self.delete_expense(search_id)
-
-            elif user_choice == "5":
-                print("---Search---")
-                self.search()
-
-            elif user_choice == "6":
-                print("---View all expenses---")
-                self.view_all_expense()
-
-            elif user_choice == "7":
-                print("---Calculate total by category---")
-                self.calculate_total_by_category()
-
-            elif user_choice == "8":
-                print("---View all categories---")
-                self.view_all_categories()
-
-            else:
-                print("Invalid choice!")
-
-            user_choice = input("Do you want to continue? Yes (Y) or No (N): ")
-
-            if user_choice.lower() == "n":
-                print("Good bye!")
+            cont = input("Do you want to continue? Yes (Y) or No (N): ").lower()
+            if cont == 'n':
+                print("Goodbye!")
                 break
+
+    def get_menu_choice(self) -> str:
+        return input(
+            "---Welcome to Expense Management App---\n"
+            "1. Add expense\n"
+            "2. Calculate total expenses\n"
+            "3. Edit an expense\n"
+            "4. Delete an expense\n"
+            "5. Search an expense\n"
+            "6. View all expenses\n"
+            "7. Calculate total by category\n"
+            "8. View all categories\n"
+        )
+
+    def process_choice(self, choice: str):
+        if choice == "1":
+            print("---Add expense---")
+            card_name = input("Enter card name: ")
+            title = input("Enter title: ")
+
+            print("-Transaction date-")
+            expense_date_year = int(input("Enter expense date YEAR: "))
+            expense_date_month = int(input("Enter expense date MONTH: "))
+            expense_date_day = int(input("Enter expense date DAY: "))
+            expense_date = datetime.date(expense_date_year, expense_date_month, expense_date_day)
+
+            amount = float(input("Enter the expense amount: "))
+            category = input("Enter category: ")
+            note = input("Enter note (optional): ")
+
+            expense = Expense(card_name, title, expense_date, amount, category, note)
+            self.total_expenses.append(expense)
+
+        elif choice == "2":
+            print("---Calculate Total---")
+            total = self.calculate_total()
+            print(f"Total amount: {total}")
+
+        elif choice == "3":
+            print("---Edit an expense---")
+            edit_id = input("Enter the expense ID you want to edit: ")
+            self.edit_expense(search_id=edit_id)
+
+        elif choice == "4":
+            search_id = int(input("Enter the ID of the expense you want to delete: "))
+            self.delete_expense(search_id)
+
+        elif choice == "5":
+            print("---Search---")
+            self.search()
+
+        elif choice == "6":
+            print("---View all expenses---")
+            self.view_all_expense()
+
+        elif choice == "7":
+            print("---Calculate total by category---")
+            self.calculate_total_by_category()
+
+        elif choice == "8":
+            print("---View all categories---")
+            self.view_all_categories()
+
+        else:
+            print("Invalid choice!")
 
     def add_expense(self, expense):
         self.total_expenses.append(expense)
@@ -83,6 +90,7 @@ class User:
             total += expense.amount
         return total
 
+    # TODO: Organize this function
     def edit_expense(self, search_id):
         found_id = False
 
@@ -194,6 +202,7 @@ class User:
         else:
             print(f"Cannot find any expense in {search_category} category.")
 
+    # TODO: Organize this function
     def search(self):
         user_input = input("What field do you want to search expense by?\n"
                            "1. ID\n"
