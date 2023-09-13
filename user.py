@@ -11,52 +11,66 @@ class User:
             user_choice = input("---Welcome to Expense Management App---\n"
                                 "1. Add expense\n"
                                 "2. Calculate total expenses\n"
-                                "3. Edit expense\n"
-                                "4. Delete expense\n"
-                                "5. Search expense\n"
-                                "6. View all expense\n"
-                                "7. Calculate total by Category\n"
-                                "8. View all Categories\n")
+                                "3. Edit an expense\n"
+                                "4. Delete an expense\n"
+                                "5. Search an expense\n"
+                                "6. View all expenses\n"
+                                "7. Calculate total by category\n"
+                                "8. View all categories\n")
             if user_choice == "1":
                 print("---Add expense---")
-                card_name = input("Enter card name: ").capitalize()
-                title = input("Enter title: ").capitalize()
+                card_name = input("Enter card name: ")
+                title = input("Enter title: ")
+
+                print("-Transaction date-")
                 expense_date_year = int(input("Enter expense date YEAR: "))
                 expense_date_month = int(input("Enter expense date MONTH: "))
                 expense_date_day = int(input("Enter expense date DAY: "))
                 expense_date = datetime.date(expense_date_year, expense_date_month, expense_date_day)
-                amount = float(input("Enter expense amount: "))
-                category = input("Enter Category: ").capitalize()
-                note = input("Enter note (optional): ").capitalize()
-                tags = list(input("Enter tags (optional): "))
 
-                expense = Expense(card_name, title, expense_date, amount, category, note, tags)
+                amount = float(input("Enter the expense amount: "))
+                category = input("Enter category: ")
+                note = input("Enter note (optional): ")
 
+                expense = Expense(card_name, title, expense_date, amount, category, note)
                 self.total_expenses.append(expense)
+
             elif user_choice == "2":
+                print("---Calculate Total---")
                 total = self.calculate_total()
                 print(f"Total amount: {total}")
+
             elif user_choice == "3":
-                pass
+                print("---Edit an expense---")
+                edit_id = input("Enter the expense ID you want to edit: ")
+                self.edit_expense(search_id=edit_id)
+
             elif user_choice == "4":
                 search_id = int(input("Enter the ID of the expense you want to delete: "))
-
                 self.delete_expense(search_id)
+
             elif user_choice == "5":
+                print("---Search---")
                 self.search()
+
             elif user_choice == "6":
-                print("---All Expenses---")
+                print("---View all expenses---")
                 self.view_all_expense()
+
             elif user_choice == "7":
+                print("---Calculate total by category---")
                 self.calculate_total_by_category()
+
             elif user_choice == "8":
+                print("---View all categories---")
                 self.view_all_categories()
+
             else:
                 print("Invalid choice!")
 
             user_choice = input("Do you want to continue? Yes (Y) or No (N): ")
 
-            if user_choice == 'N' or user_choice == "n":
+            if user_choice.lower() == "n":
                 print("Good bye!")
                 break
 
@@ -69,20 +83,65 @@ class User:
             total += expense.amount
         return total
 
-    def edit_expense(self, search_id, **kwargs):
-        found = False
-        for expense in self.total_expenses:
-            if expense.id == search_id:
-                for key, value in kwargs.items():
-                    if hasattr(expense, key):
-                        setattr(expense, key, value)
-                found = True
-                break
+    def edit_expense(self, search_id):
+        found_id = False
 
-        if found:
-            print("Successfully updated!")
+        for expense in self.total_expenses:
+            if expense.id == int(search_id):
+                edit_choice = input("What field do you want to edit?\n"
+                                    "1. Card name\n"
+                                    "2. Title\n"
+                                    "3. Expense date\n"
+                                    "4. Amount\n"
+                                    "5. Category\n"
+                                    "6. Note\n")
+                if edit_choice == "1":
+                    print("- Edit card name -")
+                    new_card_name = input("Enter new card name: ")
+                    expense.card_name = new_card_name
+                    found_id = True
+
+                elif edit_choice == "2":
+                    print("- Edit title -")
+                    new_title = input("Enter new title: ")
+                    expense.title = new_title
+                    found_id = True
+
+                elif edit_choice == "3":
+                    print("- Edit expense date -")
+                    expense_date_year = int(input("Enter expense date YEAR: "))
+                    expense_date_month = int(input("Enter expense date MONTH: "))
+                    expense_date_day = int(input("Enter expense date DAY: "))
+                    new_expense_date = datetime.date(expense_date_year, expense_date_month, expense_date_day)
+                    expense.expense_date = new_expense_date
+                    found_id = True
+
+                elif edit_choice == "4":
+                    print("- Edit amount - ")
+                    new_amount = float("Enter new amount: ")
+                    expense.amount = new_amount
+                    found_id = True
+
+                elif edit_choice == "5":
+                    print("- Edit category -")
+                    new_category = input("Enter new category: ")
+                    expense.category = new_category
+                    found_id = True
+
+                elif edit_choice == "6":
+                    print("- Edit note - ")
+                    new_note = input("Enter new note: ")
+                    expense.note = new_note
+                    found_id = True
+
+                else:
+                    print("Invalid choice")
+                    break
+
+        if not found_id:
+            print("Invalid ID")
         else:
-            print("Cannot find expense")
+            print("Successfully edited!")
 
     def delete_expense(self, search_id):
         found = False
@@ -108,16 +167,16 @@ class User:
                 categories[expense.category] += 1
             else:
                 categories[expense.category] = 1
-        print("---All Categories---")
+        print("--- All Categories ---")
         for key in categories:
-            print(f"{key}: {categories[key]}")
+            print(f"{key}: {categories[key]} expenses.")
 
     def calculate_total_by_category(self):
-        search_category = input("Enter the category you want to calculate: ").capitalize()
+        search_category = input("Enter the category you want to calculate: ")
         found_expenses = []
         total = 0
         for expense in self.total_expenses:
-            if expense.category == search_category:
+            if expense.category.lower() == search_category.lower():
                 found_expenses.append(expense)
 
         if found_expenses:
@@ -125,30 +184,34 @@ class User:
                 total += e.amount
             print(f"Total amount of expense in {search_category} category is ${total}")
         else:
-            print(f"Cannot find any expense in {search_category} category!")
+            print(f"Cannot find any expense in {search_category} category.")
 
     def search(self):
-        user_input = int(input("What field do you want to search expense by?\n"
-                               "1. ID\n"
-                               "2. Category\n"
-                               "3. Card Name\n"
-                               "4. Date\n"
-                               "5. Amount\n"
-                               "6. Note\n"
-                               "7. Tags\n"))
-        if user_input == 1:
-            search_id = int(input("Please enter the ID to look up: "))
+        user_input = input("What field do you want to search expense by?\n"
+                           "1. ID\n"
+                           "2. Category\n"
+                           "3. Card Name\n"
+                           "4. Date\n"
+                           "5. Amount\n"
+                           "6. Note\n")
 
+        if user_input == "1":
+            print("- Search by ID -")
+            search_id = input("Please enter the ID to look up: ")
             self._search_by_id(search_id=search_id)
-        elif user_input == 2:
-            search_category = input("Please enter the Category to look up: ").capitalize()
 
+        elif user_input == "2":
+            print("- Search by category -")
+            search_category = input("Please enter the category to look up: ")
             self._search_by_category(category=search_category)
-        elif user_input == 3:
-            search_card_name = input("Please enter the Card name to look up: ").capitalize()
 
+        elif user_input == "3":
+            print("- Search by card name -")
+            search_card_name = input("Please enter the Card name to look up: ")
             self._search_by_card_name(card_name=search_card_name)
-        elif user_input == 4:
+
+        elif user_input == "4":
+            print("- Search by transaction date period -")
             search_start_year = int(input("Please enter the starting year: "))
             search_start_month = int(input("Please enter the starting month: "))
             search_start_day = int(input("Please enter the starting day: "))
@@ -160,14 +223,19 @@ class User:
             search_end_date = datetime.date(search_end_year, search_end_month, search_end_day)
 
             self._search_by_date(start_date=search_start_date, end_date=search_end_date)
-        elif user_input == 5:
+
+        elif user_input == "5":
+            print("- Search by amount -")
             search_start_amount = float(input("Please enter the starting amount: "))
             search_end_amount = float(input("Please enter the ending amount: "))
 
             self._search_by_amount(start_amount=search_start_amount, end_amount=search_end_amount)
-        elif user_input == 6:
-            search_tags = list(input("Please enter the tag to look up: "))
-            self._search_by_tags(search_tags)
+
+        elif user_input == "6":
+            print("- Search by note - ")
+            search_note = input("Enter search note: ")
+            self._search_by_note(note=search_note)
+
         else:
             print("Invalid choice!")
 
@@ -175,7 +243,7 @@ class User:
         found = False
         found_expense = None
         for expense in self.total_expenses:
-            if expense.id == search_id:
+            if expense.id == int(search_id):
                 found = True
                 found_expense = expense
                 break
@@ -188,8 +256,9 @@ class User:
     def _search_by_category(self, category):
         found_expenses = []
         for expense in self.total_expenses:
-            if expense.category == category.capitalize():
+            if expense.category.lower() == category.lower():
                 found_expenses.append(expense)
+
         if found_expenses:
             print(f"Expenses in {category} category: ")
             for e in found_expenses:
@@ -200,8 +269,9 @@ class User:
     def _search_by_card_name(self, card_name):
         found_expenses = []
         for expense in self.total_expenses:
-            if expense.card_name == card_name.capitalize():
+            if expense.card_name.lower() == card_name.lower():
                 found_expenses.append(expense)
+
         if found_expenses:
             print(f"Expenses with {card_name} card: ")
             for e in found_expenses:
@@ -238,7 +308,7 @@ class User:
     def _search_by_note(self, note):
         found_expenses = []
         for expense in self.total_expenses:
-            if expense.note == note.capitalize():
+            if expense.note.lower() == note.lower():
                 found_expenses.append(expense)
 
         if found_expenses:
@@ -247,16 +317,3 @@ class User:
                 print(e)
         else:
             print(f"Cannot find any expense with {note} note")
-
-    def _search_by_tags(self, tags:list):
-        found_expenses = []
-        for tag in tags:
-            for expense in self.total_expenses:
-                if tag in expense.tags:
-                    found_expenses.append(expense)
-        if found_expenses:
-            print(f"Expenses with {tags} tags: ")
-            for e in found_expenses:
-                print(e)
-        else:
-            print(f"Cannot find any expense with {tags} tags")
