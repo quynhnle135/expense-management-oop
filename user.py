@@ -107,6 +107,7 @@ class User:
                     expense.title = new_title
                     found_id = True
 
+                # TODO: Handle if user enters incorrect year/month/date
                 elif edit_choice == "3":
                     print("- Edit expense date -")
                     expense_date_year = int(input("Enter expense date YEAR: "))
@@ -118,7 +119,7 @@ class User:
 
                 elif edit_choice == "4":
                     print("- Edit amount - ")
-                    new_amount = float("Enter new amount: ")
+                    new_amount = float(input("Enter new amount: "))
                     expense.amount = new_amount
                     found_id = True
 
@@ -157,19 +158,26 @@ class User:
             print("Cannot find expense")
 
     def view_all_expense(self):
-        for expense in self.total_expenses:
-            print(expense)
+        if self.total_expenses:
+            for expense in self.total_expenses:
+                print(expense)
+        else:
+            print("No available expense.")
 
     def view_all_categories(self):
         categories = {}
         for expense in self.total_expenses:
-            if expense.category in categories:
-                categories[expense.category] += 1
+            current_category = expense.category.lower()
+            if current_category in categories:
+                categories[current_category] += 1
             else:
-                categories[expense.category] = 1
+                categories[current_category] = 1
         print("--- All Categories ---")
         for key in categories:
-            print(f"{key}: {categories[key]} expenses.")
+            if categories[key] < 2:
+                print(f"{key}: {categories[key]} expense.")
+            else:
+                print(f"{key}: {categories[key]} expenses.")
 
     def calculate_total_by_category(self):
         search_category = input("Enter the category you want to calculate: ")
@@ -210,6 +218,7 @@ class User:
             search_card_name = input("Please enter the Card name to look up: ")
             self._search_by_card_name(card_name=search_card_name)
 
+        # TODO: Handle if user enters incorrect year/month/date
         elif user_input == "4":
             print("- Search by transaction date period -")
             search_start_year = int(input("Please enter the starting year: "))
