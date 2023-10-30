@@ -18,7 +18,7 @@ git clone https://github.com/quynhnle135/expense-management-oop.git
 
 Navigate to the project directory
 ```commandline
-cd expense-management-system
+cd expense-management-oop
 ```
 
 
