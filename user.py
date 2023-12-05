@@ -1,4 +1,6 @@
 import datetime
+from typing import Tuple
+
 from expense import Expense
 
 
@@ -6,7 +8,7 @@ class User:
     def __init__(self):
         self.total_expenses = []
 
-    def menu(self):
+    def menu(self) -> None:
         while True:
             user_choice = self.get_menu_choice()
             self.process_choice(user_choice)
@@ -29,7 +31,7 @@ class User:
             "8. View all categories\n"
         )
 
-    def process_choice(self, choice: str):
+    def process_choice(self, choice: str) -> None:
         if choice == "1":
             print("---Add expense---")
             card_name = input("Enter card name: ")
@@ -57,7 +59,7 @@ class User:
 
         elif choice == "4":
             search_id = int(input("Enter the ID of the expense you want to delete: "))
-            self.delete_expense(search_id)
+            self.delete_expense(str(search_id))
 
         elif choice == "5":
             print("---Search---")
@@ -78,16 +80,16 @@ class User:
         else:
             print("Invalid choice!")
 
-    def add_expense(self, expense):
+    def add_expense(self, expense: Expense) -> None:
         self.total_expenses.append(expense)
 
-    def calculate_total(self):
+    def calculate_total(self) -> float:
         total = 0
         for expense in self.total_expenses:
             total += expense.amount
         return total
 
-    def edit_expense(self, search_id):
+    def edit_expense(self, search_id: str) -> None:
         # Search for expense by ID
         expense = self._find_expense_by_id(search_id)
 
@@ -105,7 +107,7 @@ class User:
         else:
             print("Invalid choice")
 
-    def _find_expense_by_id(self, search_id):
+    def _find_expense_by_id(self, search_id: str):
         for expense in self.total_expenses:
             if expense.id == int(search_id):
                 return expense
@@ -120,7 +122,7 @@ class User:
                      "5. Category\n"
                      "6. Note\n")
 
-    def _apply_edit_to_expense(self, edit_choice, expense):
+    def _apply_edit_to_expense(self, edit_choice: str, expense: Expense) -> bool:
         if edit_choice == "1":
             new_card_name = input("Enter new card name: ")
             expense.card_name = new_card_name
@@ -165,7 +167,7 @@ class User:
 
         return False
 
-    def delete_expense(self, search_id):
+    def delete_expense(self, search_id: str) -> None:
         found = False
         for expense in self.total_expenses:
             if expense.id == search_id:
@@ -178,14 +180,14 @@ class User:
         else:
             print("Cannot find expense")
 
-    def view_all_expense(self):
+    def view_all_expense(self) -> None:
         if self.total_expenses:
             for expense in self.total_expenses:
                 print(expense)
         else:
             print("No available expense.")
 
-    def view_all_categories(self):
+    def view_all_categories(self) -> None:
         categories = {}
         for expense in self.total_expenses:
             current_category = expense.category.lower()
@@ -200,7 +202,7 @@ class User:
             else:
                 print(f"{key}: {categories[key]} expenses.")
 
-    def calculate_total_by_category(self):
+    def calculate_total_by_category(self) -> float:
         search_category = input("Enter the category you want to calculate: ")
         found_expenses = []
         total = 0
@@ -214,8 +216,9 @@ class User:
             print(f"Total amount of expense in {search_category} category is ${total}")
         else:
             print(f"Cannot find any expense in {search_category} category.")
+        return total
 
-    def search(self):
+    def search(self) -> None:
         user_input = input("What field do you want to search expense by?\n"
                            "1. ID\n"
                            "2. Category\n"
@@ -286,7 +289,7 @@ class User:
         else:
             print("Invalid choice!")
 
-    def _search_by_id(self, search_id):
+    def _search_by_id(self, search_id: str) -> None:
         found = False
         found_expense = None
         for expense in self.total_expenses:
@@ -300,7 +303,7 @@ class User:
         else:
             print("Couldn't find the expense!")
 
-    def _search_by_category(self, category):
+    def _search_by_category(self, category: str) -> None:
         found_expenses = []
         for expense in self.total_expenses:
             if expense.category.lower() == category.lower():
@@ -313,7 +316,7 @@ class User:
         else:
             print(f"Cannot find any expense in {category} category")
 
-    def _search_by_card_name(self, card_name):
+    def _search_by_card_name(self, card_name: str) -> None:
         found_expenses = []
         for expense in self.total_expenses:
             if expense.card_name.lower() == card_name.lower():
@@ -326,7 +329,7 @@ class User:
         else:
             print(f"Cannot find any expense using {card_name} card")
 
-    def _search_by_date(self, start_date: datetime.date, end_date: datetime.date):
+    def _search_by_date(self, start_date: datetime.date, end_date: datetime.date) -> None:
         found_expenses = []
         for expense in self.total_expenses:
             if start_date <= expense.expense_date <= end_date:
@@ -339,7 +342,7 @@ class User:
         else:
             print(f"Cannot find any expense between {str(start_date)} - {str(end_date)}")
 
-    def _search_by_amount(self, start_amount: float, end_amount: float):
+    def _search_by_amount(self, start_amount: float, end_amount: float) -> None:
         found_expenses = []
         for expense in self.total_expenses:
             if start_amount <= expense.amount <= end_amount:
@@ -352,7 +355,7 @@ class User:
         else:
             print(f"Cannot find any expenses in range {start_amount} - {end_amount}")
 
-    def _search_by_note(self, note):
+    def _search_by_note(self, note: str) -> None:
         found_expenses = []
         for expense in self.total_expenses:
             if expense.note.lower() == note.lower():
@@ -365,14 +368,14 @@ class User:
         else:
             print(f"Cannot find any expense with {note} note")
 
-    def _get_date_from_user(self, prompt):
+    def _get_date_from_user(self, prompt: str) -> datetime.date:
         year = int(input(f"{prompt} YEAR: "))
         month = int(input(f"{prompt} MONTH: "))
         day = int(input(f"{prompt} DAY: "))
 
         return datetime.date(year, month, day)
 
-    def _validate_date(self, date):
+    def _validate_date(self, date: datetime.date) -> Tuple[bool, str]:
         if not (1 <= date.month <= 12) or not (1 <= date.day <= 31):
             return False, "Invalid month or day. Please try again."
         return True, ""
